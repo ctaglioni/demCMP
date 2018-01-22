@@ -28,7 +28,8 @@ a.exch <- function(y, lambda.curr, omega.curr, lambda.cand, omega.cand, q, mu,
                      - dnorm(omega.curr, eta, tau, log=TRUE))
   # Posterior
   post <- llik.ratio + prior.ratio
-  post > log(runif(1))
+  test <- post > log(runif(1))
+  return(list(postdens = post, test = test))
 }
 
 # For model type: y_i = CMP(mu_i, nu)
@@ -65,5 +66,6 @@ a.exch1 <- function(y, lambda.curr, omega.curr, lambda.cand, omega.cand, q, mu,
                      - dnorm(omega.curr, eta, tau, log=TRUE))
   # Posterior
   post <- llik.ratio + prior.ratio
-  post > log(runif(1))
+  test <- post > log(runif(1))
+  return(list(postdens = post, test = test))
 }

@@ -55,7 +55,7 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
     par.post<- c()
     for(k in 1:n){
       par.post[k] <- a.exch(y[k], gamma.curr[k], nu.curr[k],
-                            gamma.cand[k], nu.cand[k], expo[k])
+                            gamma.cand[k], nu.cand[k], expo[k])$test
     }
 
     gamma.mat[i,] <- ifelse(par.post, gamma.cand, gamma.curr)
@@ -73,7 +73,7 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
     par.post.g<- c()
     for(k in 1:n){
       par.post.g[k] <- a.exch(y[k], gamma.curr[k], nu.curr[k],
-                              gamma.cand[k], nu.curr[k], expo[k])
+                              gamma.cand[k], nu.curr[k], expo[k])$test
     }
 
     gamma.mat[i,] <- ifelse(par.post.g, gamma.cand, gamma.curr)
@@ -83,7 +83,7 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
     par.post.n <- c()
     for(k in 1:n){
       par.post.n[k] <- a.exch(y[k], gamma.curr[k], nu.curr[k],
-                              gamma.curr[k], nu.cand[k], expo[k])
+                              gamma.curr[k], nu.cand[k], expo[k])$test
     }
 
     nu.mat[i,] <- ifelse(par.post.n, nu.cand, nu.curr)
@@ -219,7 +219,7 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
       par.post[k] <- a.exch(y[k], lambda.curr[k], omega.curr[k],
                             lambda.cand[k], omega.cand[k],
                             expo[k], mu.curr, sigma.curr,
-                            eta.curr, tau.curr)
+                            eta.curr, tau.curr)$test
     }
 
     lambda.mat[i,] <- ifelse(par.post, lambda.cand, lambda.curr)
@@ -328,7 +328,7 @@ mcmc.dem.KV <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
       par.post[k] <- a.exch(y[k], lambda.curr[k], omega.curr[k],
                             lambda.cand[k], omega.cand[k],
                             expo[k], mu.curr, sigma,
-                            eta.curr, tau)
+                            eta.curr, tau)$test
     }
 
     lambda.mat[i,] <- ifelse(par.post, lambda.cand, lambda.curr)
@@ -407,7 +407,7 @@ mcmc.dem.lo <- function(y, iter, expo, lambda0 = rep(0,length(y)),
       par.post[k] <- a.exch(y[k], lambda.curr[k], omega.curr[k],
                             lambda.cand[k], omega.cand[k],
                             expo[k], mu, sigma,
-                            eta, tau)
+                            eta, tau)$test
     }
 
     lambda.mat[i,] <- ifelse(par.post, lambda.cand, lambda.curr)
@@ -474,7 +474,7 @@ mcmc.dem.om <- function(y, iter, expo, lambda, omega0 = rep(0,length(y)),
     for(k in 1:n){
       par.post[k] <- a.exch(y[k], lambda[k], omega.curr[k],
                             lambda[k], omega.cand[k],
-                            expo[k], mu, sigma, eta, tau)
+                            expo[k], mu, sigma, eta, tau)$test
     }
 
     omega.mat[i,] <- ifelse(par.post, omega.cand, omega.curr)
@@ -582,7 +582,7 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
       par.post.lambda[k] <- a.exch(y[k], lambda.curr[k], omega.curr[k],
                                    lambda.cand[k], omega.curr[k],
                                    expo[k], mu.curr, sigma,
-                                   eta.curr, tau)
+                                   eta.curr, tau)$test
     }
 
     lambda.mat[i,] <- ifelse(par.post, lambda.cand, lambda.curr)
@@ -596,7 +596,7 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
       par.post.omega[k] <- a.exch(y[k], lambda.curr[k], omega.curr[k],
                                   lambda.curr[k], omega.cand[k],
                                   expo[k], mu.curr, sigma,
-                                  eta.curr, tau)
+                                  eta.curr, tau)$test
     }
 
     omega.mat[i,] <- ifelse(par.post, omega.cand, omega.curr)

@@ -64,7 +64,7 @@ mcmc.dem.lo.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0
       par.post.lambda[k] <- a.exch(y[k], lambda.curr[k], omega.curr,
                                    lambda.cand[k], omega.cand,
                                    expo[k], mu, sigma,
-                                   eta, tau)
+                                   eta, tau)$test
     }
 
 
@@ -74,7 +74,7 @@ mcmc.dem.lo.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0
     par.post.omega <- a.exch1(y, lambda.curr, omega.curr,
                               lambda.curr, omega.cand,
                               expo, mu, sigma,
-                              eta, tau)
+                              eta, tau)$test
     if(par.post.omega){
       omega.vec[i] <- omega.cand
       acceptance.omega <- acceptance.omega + 1
@@ -142,7 +142,7 @@ mcmc.dem.om.un <- function(y, iter, expo, lambda, omega0 = 0,
     # Exchange algorithm for lambda and omega
     par.post <- a.exch1(y, lambda, omega.curr,
                         lambda, omega.cand,
-                        expo, mu, sigma, eta, tau)
+                        expo, mu, sigma, eta, tau)$test
 
     if(par.post){
       omega.vec[i] <- omega.cand
@@ -254,7 +254,7 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
       par.post.lambda[k] <- a.exch(y[k], lambda.curr[k], omega.curr,
                                    lambda.cand[k], omega.curr,
                                    expo[k], mu.curr, sigma,
-                                   eta.curr, tau)
+                                   eta.curr, tau)$test
     }
 
     lambda.mat[i,] <- ifelse(par.post.lambda, lambda.cand, lambda.curr)
@@ -265,7 +265,7 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
     par.post.omega <- a.exch1(y, lambda.curr, omega.curr,
                               lambda.curr, omega.cand,
                               expo, mu.curr, sigma,
-                              eta.curr, tau)
+                              eta.curr, tau)$test
 
     if(par.post.omega){
       omega.vec[i] <- omega.cand
@@ -383,7 +383,7 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
       par.post[k] <- a.exch(y[k], lambda.curr[k], omega.curr[k],
                             lambda.cand[k], omega.cand[k],
                             expo[k], mu.curr, sigma,
-                            eta.curr, tau)
+                            eta.curr, tau)$test
     }
 
     lambda.mat[i,] <- ifelse(par.post, lambda.cand, lambda.curr)
@@ -393,7 +393,7 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
     # Exchange algorithm for lambda
 
     par.post.lambda <- a.exch1(y, lambda.curr, omega.curr, lambda.cand, omega.curr, expo,
-                               mu.curr, sigma, eta.curr, tau)
+                               mu.curr, sigma, eta.curr, tau)$test
 
 
     lambda.mat[i,] <- ifelse(par.post.lambda, lambda.cand, lambda.curr)
@@ -403,7 +403,7 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
 
     par.post.omega <- a.exch1(y, lambda.curr, omega.curr,
                               lambda.curr, omega.cand, expo,
-                              mu.curr, sigma, eta.curr, tau)
+                              mu.curr, sigma, eta.curr, tau)$test
 
     omega.mat[i,] <- ifelse(par.post.omega, omega.cand, omega.curr)
     acceptance.omega <- ifelse(par.post.omega, acceptance.omega + 1, acceptance.omega)
