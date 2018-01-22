@@ -42,10 +42,10 @@ mcmc.dem.lo.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0
       var.omega.cand <- var.omega.cand
     } else {
       if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu.curr
-        mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma.curr
-        var.omega.cand <- tau.curr
+        mean.lambda.cand <- mu
+        mean.omega.cand <- eta
+        var.lambda.cand <- sigma
+        var.omega.cand <- tau
       } else{
         mean.lambda.cand <- mean.lambda.cand
         mean.omega.cand <- mean.omega.cand
@@ -165,7 +165,7 @@ mcmc.dem.om.un <- function(y, iter, expo, lambda, omega0 = 0,
 #------------------------------------------------------------------
 
 mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
-                             mu0 = 0, sigma0 = 0.1, eta0 = 0, tau0 = 0.1,
+                             mu0 = 0, sigma, eta0 = 0, tau,
                              alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
                              mean.lambda.cand = 0, mean.omega.cand = 0,
                              var.lambda.cand = 1, var.omega.cand = 1,
@@ -234,8 +234,8 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
       if(model.upd=="Gibbs"){
         mean.lambda.cand <- mu.curr
         mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma.curr
-        var.omega.cand <- tau.curr
+        var.lambda.cand <- sigma
+        var.omega.cand <- tau
       } else{
         mean.lambda.cand <- mean.lambda.cand
         mean.omega.cand <- mean.omega.cand
@@ -292,7 +292,7 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
 #-------------------------------------------------------------------
 
 mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(0,length(y)),
-                            mu0 = 0, sigma, eta0 = 0, tau0 = 0,
+                            mu0 = 0, sigma, eta0 = 0, tau,
                             alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
                             mean.lambda.cand = 0, mean.omega.cand = 0,
                             var.lambda.cand = 10, var.omega.cand = 10,
@@ -361,8 +361,8 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
       if(model.upd=="Gibbs"){
         mean.lambda.cand <- mu.curr
         mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma.curr
-        var.omega.cand <- tau.curr
+        var.lambda.cand <- sigma
+        var.omega.cand <- tau
       } else{
         mean.lambda.cand <- mean.lambda.cand
         mean.omega.cand <- mean.omega.cand

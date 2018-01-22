@@ -308,8 +308,8 @@ mcmc.dem.KV <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
       if(model.upd=="Gibbs"){
         mean.lambda.cand <- mu.curr
         mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma.curr
-        var.omega.cand <- tau.curr
+        var.lambda.cand <- sigma
+        var.omega.cand <- tau
       } else{
         mean.lambda.cand <- mean.lambda.cand
         mean.omega.cand <- mean.omega.cand
@@ -562,8 +562,8 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
       if(model.upd=="Gibbs"){
         mean.lambda.cand <- mu.curr
         mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma.curr
-        var.omega.cand <- tau.curr
+        var.lambda.cand <- sigma
+        var.omega.cand <- tau
       } else{
         mean.lambda.cand <- mean.lambda.cand
         mean.omega.cand <- mean.omega.cand
