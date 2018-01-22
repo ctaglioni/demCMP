@@ -1,9 +1,9 @@
 #--------------------------------------------
-# MCMC For model type: y_i ~ CMP(mu_i, nu_i)
+# MCMC For model type: y_i = CMP(mu_i, nu_i)
 #--------------------------------------------
 library(LaplacesDemon) # to use half t distribution
 #---------------------------------
-# First simple model, sd ~ half t
+# First simple model, sd = half t
 #---------------------------------
 # Function for variance M-H algorithm
 lpost.var <- function(var.cand, ldata.curr, mean.curr, var.curr, scale.var, nu.var){

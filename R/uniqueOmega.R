@@ -1,4 +1,4 @@
-# For model type: y_i ~ CMP(mu_i, nu)
+# For model type: y_i = CMP(mu_i, nu)
 
 #-------------------------------------
 # Only estimate lambda and omega

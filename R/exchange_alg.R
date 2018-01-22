@@ -2,7 +2,7 @@
 # Exchange algorithms
 #---------------------
 
-# For model type: y_i ~ CMP(mu_i, nu_i)
+# For model type: y_i = CMP(mu_i, nu_i)
 # The function applies to one observation at time
 a.exch <- function(y, lambda.curr, omega.curr, lambda.cand, omega.cand, q, mu,
                    sigma, eta, tau, max = 10^4){
@@ -31,7 +31,7 @@ a.exch <- function(y, lambda.curr, omega.curr, lambda.cand, omega.cand, q, mu,
   post > log(runif(1))
 }
 
-# For model type: y_i ~ CMP(mu_i, nu)
+# For model type: y_i = CMP(mu_i, nu)
 # The function applies to all the data y
 a.exch1 <- function(y, lambda.curr, omega.curr, lambda.cand, omega.cand, q, mu,
                     sigma, eta, tau, max = 10^4){
