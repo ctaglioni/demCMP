@@ -103,7 +103,8 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
 # Model assuming IG prior on Variance
 # (i.e. Gibbs sampling for sigma and tau as conjugate model)
 #-------------------------------------
-
+i=2
+iter<-100
 mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(0,length(y)),
                         mu0 = 0, sigma0 = 0.1, eta0 = 0, tau0 = 0.5,
                         alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
@@ -124,7 +125,7 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
 
   # Initialise
 
-  lambda.mat[1,] <- lambda0
+  lambda.mat[1,]<- lambda0
   omega.mat[1,] <- omega0
   mu.vec[1] <- mu0
   sigma.vec[1] <- sigma0
@@ -147,7 +148,7 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
     # mean
     num.alpha <- alpha0 / beta0 + sum(lambda.mat[(i-1),])/sigma.vec[(i-1)]
     den.alpha <- (1 / beta0 + n / sigma.vec[(i-1)])
-    alpha <-  num.alpha / den.alpha
+    alpha<-  num.alpha / den.alpha
     # sd
     beta <- sqrt(1 / (1 / beta0 + n / sigma.vec[(i-1)]))
     #
@@ -186,10 +187,29 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
 
     # candidate for lambda and omega:
     # by default standard normal or if model.upd == "RW" it is a random walk step
-    mean.lambda.cand <- ifelse(model.upd=="RW", lambda.mat[(i-1),], mean.lambda.cand)
-    mean.omega.cand <- ifelse(model.upd=="RW", omega.mat[(i-1),], mean.omega.cand)
+    # or with hyperparameters if Gibbs
+    if(model.upd=="RW"){
+      mean.lambda.cand <- lambda.mat[(i-1),]
+      mean.omega.cand <- omega.mat[(i-1),]
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
+    } else {
+      if(model.upd=="Gibbs"){
+        mean.lambda.cand <- mu.curr
+        mean.omega.cand <- eta.curr
+        var.lambda.cand <- sigma.curr
+        var.omega.cand <- tau.curr
+      } else{
+        mean.lambda.cand <- mean.lambda.cand
+        mean.omega.cand <- mean.omega.cand
+        var.lambda.cand <- var.lambda.cand
+        var.omega.cand <- var.omega.cand
+      }
+    }
+
+
     #
-    lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
+    lambda.cand<- rnorm(n, mean.lambda.cand, var.lambda.cand)
     omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
 
 
@@ -278,9 +298,25 @@ mcmc.dem.KV <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
 
     # candidate for lambda and omega:
     # by default standard normal or if model.upd == "RW" it is a random walk step
-    # not using mu and eta values from the Gibbs sampler in the proposal
-    mean.lambda.cand <- ifelse(model.upd=="RW", lambda.mat[(i-1),], mean.lambda.cand)
-    mean.omega.cand <- ifelse(model.upd=="RW", omega.mat[(i-1),], mean.omega.cand)
+    # or with hyperparameters if Gibbs
+    if(model.upd=="RW"){
+      mean.lambda.cand <- lambda.mat[(i-1),]
+      mean.omega.cand <- omega.mat[(i-1),]
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
+    } else {
+      if(model.upd=="Gibbs"){
+        mean.lambda.cand <- mu.curr
+        mean.omega.cand <- eta.curr
+        var.lambda.cand <- sigma.curr
+        var.omega.cand <- tau.curr
+      } else{
+        mean.lambda.cand <- mean.lambda.cand
+        mean.omega.cand <- mean.omega.cand
+        var.lambda.cand <- var.lambda.cand
+        var.omega.cand <- var.omega.cand
+      }
+    }
     #
     lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
     omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
@@ -341,8 +377,25 @@ mcmc.dem.lo <- function(y, iter, expo, lambda0 = rep(0,length(y)),
 
     # candidate for lambda and omega:
     # by default standard normal or if model.upd == "RW" it is a random walk step
-    mean.lambda.cand <- ifelse(model.upd=="RW", lambda.mat[(i-1),], mean.lambda.cand)
-    mean.omega.cand <- ifelse(model.upd=="RW", omega.mat[(i-1),], mean.omega.cand)
+    # or with hyperparameters if Gibbs
+    if(model.upd=="RW"){
+      mean.lambda.cand <- lambda.mat[(i-1),]
+      mean.omega.cand <- omega.mat[(i-1),]
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
+    } else {
+      if(model.upd=="Gibbs"){
+        mean.lambda.cand <- mu
+        mean.omega.cand <- eta
+        var.lambda.cand <- sigma
+        var.omega.cand <- tau
+      } else{
+        mean.lambda.cand <- mean.lambda.cand
+        mean.omega.cand <- mean.omega.cand
+        var.lambda.cand <- var.lambda.cand
+        var.omega.cand <- var.omega.cand
+      }
+    }
     #
     lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
     omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
@@ -397,10 +450,21 @@ mcmc.dem.om <- function(y, iter, expo, lambda, omega0 = rep(0,length(y)),
 
     omega.curr <- omega.mat[(i-1),]
     #
-
     # candidate for lambda and omega:
     # by default standard normal or if model.upd == "RW" it is a random walk step
-    mean.omega.cand <- ifelse(model.upd=="RW", omega.mat[(i-1),], mean.omega.cand)
+    # or with hyperparameters if Gibbs
+    if(model.upd=="RW"){
+      mean.omega.cand <- omega.mat[(i-1),]
+      var.omega.cand <- var.omega.cand
+    } else {
+      if(model.upd=="Gibbs"){
+        mean.omega.cand <- eta
+        var.omega.cand <- tau
+      } else{
+        mean.omega.cand <- mean.omega.cand
+        var.omega.cand <- var.omega.cand
+      }
+    }
     #
     omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
 
@@ -488,9 +552,26 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
 
     # candidate for lambda and omega:
     # by default standard normal or if model.upd == "RW" it is a random walk step
-    mean.lambda.cand <- ifelse(model.upd=="RW", lambda.mat[(i-1),], mean.lambda.cand)
-    mean.omega.cand <- ifelse(model.upd=="RW", omega.mat[(i-1),], mean.omega.cand)
-    #
+    # or with hyperparameters if Gibbs
+    if(model.upd=="RW"){
+      mean.lambda.cand <- lambda.mat[(i-1),]
+      mean.omega.cand <- omega.mat[(i-1),]
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
+    } else {
+      if(model.upd=="Gibbs"){
+        mean.lambda.cand <- mu.curr
+        mean.omega.cand <- eta.curr
+        var.lambda.cand <- sigma.curr
+        var.omega.cand <- tau.curr
+      } else{
+        mean.lambda.cand <- mean.lambda.cand
+        mean.omega.cand <- mean.omega.cand
+        var.lambda.cand <- var.lambda.cand
+        var.omega.cand <- var.omega.cand
+      }
+    }
+   #
     lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
     omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
 
