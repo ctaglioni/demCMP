@@ -3,9 +3,12 @@ Type: Package
 Title: Functions for analysing demographic data with CMP distribution
 Version: 0.1.0
 Author: Charlotte Taglioni
-Maintainer: The package maintainer <yourself@somewhere.net>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Maintainer: Charlotte Taglioni <charlotte.taglioni@phd.unipd.it>
+Description: Given two datasets a reliable one (e.g. census data) and 
+    another datasets which might suffer of under or over-coverage an/or 
+    variability the functions estimate the value of the parameters of 
+    the CMP distribution via MCMC. Functions have different level of 
+    complexity.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
