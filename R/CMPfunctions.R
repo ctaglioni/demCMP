@@ -5,7 +5,7 @@
 # Unnormalised CMP density function
 logDensCMP1 <- function(y, gamma, nu, useC = FALSE) {
   ## 'y'
-  stopifnot(is.integer(y))
+  stopifnot(round(y)==y)
   stopifnot(identical(length(y), 1L))
   stopifnot(!is.na(y))
   stopifnot(y >= 0L)
