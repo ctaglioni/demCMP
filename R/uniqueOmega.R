@@ -4,7 +4,7 @@
 # Only estimate lambda and omega
 #-------------------------------------
 
-mcmc.dem.lo1 <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
+mcmc.dem.lo.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
                          mu, sigma, eta, tau,
                          mean.lambda.cand = 0, mean.omega.cand = 0,
                          var.lambda.cand = 1, var.omega.cand = 1,
@@ -78,7 +78,7 @@ mcmc.dem.lo1 <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
 # Only estimate unique omega
 #-------------------------------------
 
-mcmc.dem.om1 <- function(y, iter, expo, lambda, omega0 = 0,
+mcmc.dem.om.un <- function(y, iter, expo, lambda, omega0 = 0,
                          mu, sigma, eta, tau,
                          mean.omega.cand = 0,
                          var.omega.cand = 1,
@@ -135,7 +135,7 @@ mcmc.dem.om1 <- function(y, iter, expo, lambda, omega0 = 0,
 # Variance known, unique omega, separate updating lambda and omega
 #------------------------------------------------------------------
 
-mcmc.dem.kvslom1 <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
+mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
                              mu0 = 0, sigma0 = 0.1, eta0 = 0, tau0 = 0.1,
                              alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
                              mean.lambda.cand = 0, mean.omega.cand = 0,
@@ -354,5 +354,3 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
                                  omega = acceptance.omega/iter)))
 }
 
-library(devtools)
-devtools::load_all()
