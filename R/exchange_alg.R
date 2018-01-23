@@ -62,8 +62,10 @@ a.exch1 <- function(y, lambda.curr, omega.curr, lambda.cand, omega.cand, q, mu,
   }
   llik.ratio <- sum(llik1)
   # Prior ratio
-  prior.ratio <- sum(dnorm(omega.cand, eta, tau, log=TRUE),
-                     - dnorm(omega.curr, eta, tau, log=TRUE))
+  prior.ratio <- sum(sum(dnorm(lambda.cand,mu,sigma, log = TRUE)),
+                     -sum(dnorm(lambda.curr,mu,sigma, log = TRUE)),
+                     dnorm(omega.cand, eta, tau, log = TRUE),
+                     - dnorm(omega.curr, eta, tau, log = TRUE))
   # Posterior
   post <- llik.ratio + prior.ratio
   test <- post > log(runif(1))
