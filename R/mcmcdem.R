@@ -15,11 +15,10 @@ lpost.var <- function(var.cand, ldata.curr, mean.curr, var.curr, scale.var, nu.v
   return(lpost>log(runif(1)))
 }
 
-
-
-mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
-                            lgamma0 = log(gamma0), lnu0 = log(nu0)){
-
+mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,length(y)), nu0 = rep(1,length(y)),
+                            lgamma0 = log(gamma0), lnu0 = log(nu0),
+                            mu = 0, sigma = 10, eta = 0, tau =10){
+  n <-length(y)
   gamma.mat <- matrix(NA, iter, n)
   nu.mat <- matrix(NA, iter, n)
 
@@ -42,7 +41,7 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
     if(i%%(0.1*iter)==0) print(i)
     gamma.curr <- gamma.mat[i-1,]
     nu.curr <- nu.mat[i-1,]
-    lgamma.curr <- log(gamma.curr)
+    lgamma.curr<- log(gamma.curr)
     lnu.curr <- log(nu.curr)
 
 
@@ -50,45 +49,48 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
 
     # candidate for c(gamma, nu):
 
-    gamma.cand <- exp(rnorm(n, lgamma.curr, 0.1))
-    nu.cand <- exp(rnorm(n, lnu.curr, 0.1))
+    lgamma.cand <- rnorm(n, lgamma.curr, 0.1)
+    lnu.cand <- rnorm(n, lnu.curr, 0.1)
 
     # Exchange algorithm for gamma and nu
     par.post<- c()
     for(k in 1:n){
-      par.post[k] <- a.exch(y[k], gamma.curr[k], nu.curr[k],
-                            gamma.cand[k], nu.cand[k], expo[k])$test
+      par.post[k] <- a.exch(y[k], lgamma.curr[k], lnu.curr[k],
+                            lgamma.cand[k], lnu.cand[k], expo[k], mu,
+                            sigma, eta, tau)$test
     }
 
-    gamma.mat[i,] <- ifelse(par.post, gamma.cand, gamma.curr)
-    nu.mat[i,] <- ifelse(par.post, nu.cand, nu.curr)
+    gamma.mat[i,] <- ifelse(par.post, exp(lgamma.cand), exp(lgamma.curr))
+    nu.mat[i,] <- ifelse(par.post, exp(lnu.cand), exp(lnu.curr))
     gamma.nu.acc <- ifelse(par.post, gamma.nu.acc+1, gamma.nu.acc)
-    lgamma.curr <- ifelse(par.post, log(gamma.cand), log(gamma.curr))
-    lnu.curr <- ifelse(par.post, log(nu.cand), log(nu.curr))
+    lgamma.curr <- ifelse(par.post, lgamma.cand, lgamma.curr)
+    lnu.curr <- ifelse(par.post, lnu.cand, lnu.curr)
 
     # candidate for c(gamma, nu):
 
-    gamma.cand <- exp(rnorm(n, lgamma.curr, 0.1))
-    nu.cand <- exp(rnorm(n, lnu.curr, 0.1))
+    lgamma.cand2 <- rnorm(n, lgamma.curr, 0.1)
+    lnu.cand2 <- rnorm(n, lnu.curr, 0.1)
 
     # Exchange algorithm for gamma:
     par.post.g<- c()
     for(k in 1:n){
-      par.post.g[k] <- a.exch(y[k], gamma.curr[k], nu.curr[k],
-                              gamma.cand[k], nu.curr[k], expo[k])$test
+      par.post.g[k] <- a.exch(y[k], lgamma.curr[k], lnu.curr[k],
+                              lgamma.cand2[k], lnu.curr[k], expo[k], 
+                              mu, sigma, eta, tau)$test
     }
 
-    gamma.mat[i,] <- ifelse(par.post.g, gamma.cand, gamma.curr)
+    gamma.mat[i,] <- ifelse(par.post.g, exp(lgamma.cand2), exp(lgamma.curr))
     gamma.acc <- ifelse(par.post.g, gamma.acc+1, gamma.acc)
 
     # Exchange algorithm for nu:
     par.post.n <- c()
     for(k in 1:n){
-      par.post.n[k] <- a.exch(y[k], gamma.curr[k], nu.curr[k],
-                              gamma.curr[k], nu.cand[k], expo[k])$test
+      par.post.n[k] <- a.exch(y[k], lgamma.curr[k], lnu.curr[k],
+                              lgamma.curr[k], lnu.cand2[k], expo[k],
+                              mu, sigma, eta, tau)$test
     }
 
-    nu.mat[i,] <- ifelse(par.post.n, nu.cand, nu.curr)
+    nu.mat[i,] <- ifelse(par.post.n, exp(lnu.cand2), exp(lnu.curr))
     nu.acc <- ifelse(par.post.n, nu.acc+1, nu.acc)
 
 
@@ -105,6 +107,7 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
 # Model assuming IG prior on Variance
 # (i.e. Gibbs sampling for sigma and tau as conjugate model)
 #-------------------------------------
+
 mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(0,length(y)),
                         mu0 = 0, sigma0 = 0.1, eta0 = 0, tau0 = 0.5,
                         alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
@@ -148,7 +151,7 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
     # mean
     num.alpha <- alpha0 / beta0 + sum(lambda.mat[(i-1),])/sigma.vec[(i-1)]
     den.alpha <- (1 / beta0 + n / sigma.vec[(i-1)])
-    alpha<-  num.alpha / den.alpha
+    alpha <-  num.alpha / den.alpha
     # sd
     beta <- sqrt(1 / (1 / beta0 + n / sigma.vec[(i-1)]))
     #
@@ -419,7 +422,6 @@ mcmc.dem.lo <- function(y, iter, expo, lambda0 = rep(0,length(y)),
 #---------------------------------------
 # Only estimate omega
 #---------------------------------------
-
 mcmc.dem.om <- function(y, iter, expo, lambda, omega0 = rep(0,length(y)),
                         mu, sigma, eta, tau,
                         mean.omega.cand = 0,
@@ -483,10 +485,9 @@ mcmc.dem.om <- function(y, iter, expo, lambda, omega0 = rep(0,length(y)),
 #----------------------------------------------------
 # Variance known, separate updating lambda and omega
 #----------------------------------------------------
-
 mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(0,length(y)),
                             mu0 = 0, sigma, eta0 = 0, tau0 = 0,
-                            alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
+                            alpha0 = 0, beta0 = 10, delta0 = 0, xi0 = 10,
                             mean.lambda.cand = 0, mean.omega.cand = 0,
                             var.lambda.cand = 1, var.omega.cand = 1,
                             model.upd){
@@ -531,7 +532,7 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
 
     # Update eta
     # mean
-    num.delta <- delta0 / xi0 + omega.mat[(i-1),]/tau
+    num.delta <- delta0 / xi0 + sum(omega.mat[(i-1),])/tau
     den.delta <- 1 / xi0 + 1 / tau
     delta <-  num.delta / den.delta
     # sd

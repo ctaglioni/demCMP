@@ -3,7 +3,6 @@
 #-------------------------------------
 # Only estimate lambda and omega
 #-------------------------------------
-
 mcmc.dem.lo.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
                          mu, sigma, eta, tau,
                          mean.lambda.cand = 0, mean.omega.cand = 0,
@@ -92,7 +91,6 @@ mcmc.dem.lo.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0
 #-------------------------------------
 # Only estimate unique omega
 #-------------------------------------
-
 mcmc.dem.om.un <- function(y, iter, expo, lambda, omega0 = 0,
                          mu, sigma, eta, tau,
                          mean.omega.cand = 0,
@@ -159,10 +157,9 @@ mcmc.dem.om.un <- function(y, iter, expo, lambda, omega0 = 0,
 #------------------------------------------------------------------
 # Variance known, unique omega, separate updating lambda and omega
 #------------------------------------------------------------------
-
 mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0,
                              mu0 = 0, sigma, eta0 = 0, tau,
-                             alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
+                             alpha0 = 0, beta0 = 10, delta0 = 0, xi0 = 10,
                              mean.lambda.cand = 0, mean.omega.cand = 0,
                              var.lambda.cand = 1, var.omega.cand = 1,
                              model.upd){
@@ -207,7 +204,7 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
 
     # Update eta
     # mean
-    num.delta <- delta0 / xi0 + omega.vec[(i-1)]/tau
+    num.delta <- delta0 / xi0 + sum(omega.vec[(i-1)])/tau
     den.delta <- 1 / xi0 + 1 / tau
     delta <-  num.delta / den.delta
     # sd
@@ -268,8 +265,8 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
       omega.vec[i] <- omega.curr
       acceptance.omega <- acceptance.omega}
 
-
   }
+
 
 
   return(list (parameters = list(gamma = exp(lambda.mat), nu = exp(omega.vec),
@@ -284,10 +281,9 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
 #-------------------------------------------------------------------
 # Variance and second level known, double updating lambda and omega
 #-------------------------------------------------------------------
-
 mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(0,length(y)),
                             mu0 = 0, sigma, eta0 = 0, tau,
-                            alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
+                            alpha0 = 0, beta0 = 10, delta0 = 0, xi0 = 10,
                             mean.lambda.cand = 0, mean.omega.cand = 0,
                             var.lambda.cand = 10, var.omega.cand = 10,
                             model.upd){
@@ -332,7 +328,7 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
 
     # Update eta
     # mean
-    num.delta <- delta0 / xi0 + omega.mat[(i-1),]/tau
+    num.delta <- delta0 / xi0 + sum(omega.mat[(i-1),])/tau
     den.delta <- 1 / xi0 + 1 / tau
     delta <-  num.delta / den.delta
     # sd
@@ -385,19 +381,24 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
 
     # Exchange algorithm for lambda
 
-    par.post.lambda <- a.exch1(y, lambda.curr, omega.curr, lambda.cand, omega.curr, expo,
-                               mu.curr, sigma, eta.curr, tau)$test
-
+    par.post.lambda <- c()
+    for(k in 1:n){
+      par.post.lambda[k] <- a.exch1(y[k], lambda.curr[k], omega.curr[k],
+                                    lambda.cand[k], omega.curr[k], expo[k],
+                                    mu.curr, sigma, eta.curr, tau)$test
+      }
 
     lambda.mat[i,] <- ifelse(par.post.lambda, lambda.cand, lambda.curr)
     acceptance.lambda <- ifelse(par.post.lambda, acceptance.lambda + 1, acceptance.lambda)
 
     # Exchange algorithm for omega
 
-    par.post.omega <- a.exch1(y, lambda.curr, omega.curr,
-                              lambda.curr, omega.cand, expo,
-                              mu.curr, sigma, eta.curr, tau)$test
-
+    par.post.omega <- c()
+    for(k in 1:n){
+      par.post.omega[k] <- a.exch1(y[k], lambda.curr[k], omega.curr[k],
+                                    lambda.curr[k], omega.cand[k], expo[k],
+                                    mu.curr, sigma, eta.curr, tau)$test
+    }
     omega.mat[i,] <- ifelse(par.post.omega, omega.cand, omega.curr)
     acceptance.omega <- ifelse(par.post.omega, acceptance.omega + 1, acceptance.omega)
 
