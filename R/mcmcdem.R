@@ -199,8 +199,8 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
     } else if(model.upd=="Gibbs"){
       mean.lambda.cand <- mu.curr
       mean.omega.cand <- eta.curr
-      var.lambda.cand <- sigma.curr
-      var.omega.cand <- tau.curr
+      var.lambda.cand <- sqrt(sigma.curr)
+      var.omega.cand <- sqrt(tau.curr)
     } else{
       mean.lambda.cand <- mean.lambda.cand
       mean.omega.cand <- mean.omega.cand
