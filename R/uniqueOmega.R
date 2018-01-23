@@ -40,18 +40,16 @@ mcmc.dem.lo.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 0
       mean.omega.cand <- omega.vec[i-1]
       var.lambda.cand <- var.lambda.cand
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu
-        mean.omega.cand <- eta
-        var.lambda.cand <- sigma
-        var.omega.cand <- tau
-      } else{
-        mean.lambda.cand <- mean.lambda.cand
-        mean.omega.cand <- mean.omega.cand
-        var.lambda.cand <- var.lambda.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.lambda.cand <- mu
+      mean.omega.cand <- eta
+      var.lambda.cand <- sigma
+      var.omega.cand <- tau
+    } else{
+      mean.lambda.cand <- mean.lambda.cand
+      mean.omega.cand <- mean.omega.cand
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
     }
     #
     lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
@@ -125,14 +123,12 @@ mcmc.dem.om.un <- function(y, iter, expo, lambda, omega0 = 0,
     if(model.upd=="RW"){
       mean.omega.cand <- omega.vec[i-1]
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.omega.cand <- eta
-        var.omega.cand <- tau
-      } else{
-        mean.omega.cand <- mean.omega.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.omega.cand <- eta
+      var.omega.cand <- tau
+    } else{
+      mean.omega.cand <- mean.omega.cand
+      var.omega.cand <- var.omega.cand
     }
 
     #
@@ -230,18 +226,16 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
       mean.omega.cand <- omega.vec[i-1]
       var.lambda.cand <- var.lambda.cand
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu.curr
-        mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma
-        var.omega.cand <- tau
-      } else{
-        mean.lambda.cand <- mean.lambda.cand
-        mean.omega.cand <- mean.omega.cand
-        var.lambda.cand <- var.lambda.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.lambda.cand <- mu.curr
+      mean.omega.cand <- eta.curr
+      var.lambda.cand <- sigma
+      var.omega.cand <- tau
+    } else{
+      mean.lambda.cand <- mean.lambda.cand
+      mean.omega.cand <- mean.omega.cand
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
     }
     #
     lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
@@ -357,19 +351,18 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
       mean.omega.cand <- omega.vec[i-1]
       var.lambda.cand <- var.lambda.cand
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu.curr
-        mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma
-        var.omega.cand <- tau
-      } else{
-        mean.lambda.cand <- mean.lambda.cand
-        mean.omega.cand <- mean.omega.cand
-        var.lambda.cand <- var.lambda.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.lambda.cand <- mu.curr
+      mean.omega.cand <- eta.curr
+      var.lambda.cand <- sigma
+      var.omega.cand <- tau
+    } else{
+      mean.lambda.cand <- mean.lambda.cand
+      mean.omega.cand <- mean.omega.cand
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
     }
+
 
 
     #

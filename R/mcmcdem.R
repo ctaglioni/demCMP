@@ -15,6 +15,8 @@ lpost.var <- function(var.cand, ldata.curr, mean.curr, var.curr, scale.var, nu.v
   return(lpost>log(runif(1)))
 }
 
+
+
 mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
                             lgamma0 = log(gamma0), lnu0 = log(nu0)){
 
@@ -103,8 +105,6 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,n), nu0 = rep(1,n),
 # Model assuming IG prior on Variance
 # (i.e. Gibbs sampling for sigma and tau as conjugate model)
 #-------------------------------------
-i=2
-iter<-100
 mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(0,length(y)),
                         mu0 = 0, sigma0 = 0.1, eta0 = 0, tau0 = 0.5,
                         alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
@@ -193,18 +193,16 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
       mean.omega.cand <- omega.mat[(i-1),]
       var.lambda.cand <- var.lambda.cand
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu.curr
-        mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma.curr
-        var.omega.cand <- tau.curr
-      } else{
-        mean.lambda.cand <- mean.lambda.cand
-        mean.omega.cand <- mean.omega.cand
-        var.lambda.cand <- var.lambda.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.lambda.cand <- mu.curr
+      mean.omega.cand <- eta.curr
+      var.lambda.cand <- sigma.curr
+      var.omega.cand <- tau.curr
+    } else{
+      mean.lambda.cand <- mean.lambda.cand
+      mean.omega.cand <- mean.omega.cand
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
     }
 
 
@@ -304,18 +302,16 @@ mcmc.dem.KV <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
       mean.omega.cand <- omega.mat[(i-1),]
       var.lambda.cand <- var.lambda.cand
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu.curr
-        mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma
-        var.omega.cand <- tau
-      } else{
-        mean.lambda.cand <- mean.lambda.cand
-        mean.omega.cand <- mean.omega.cand
-        var.lambda.cand <- var.lambda.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.lambda.cand <- mu.curr
+      mean.omega.cand <- eta.curr
+      var.lambda.cand <- sigma
+      var.omega.cand <- tau
+    } else{
+      mean.lambda.cand <- mean.lambda.cand
+      mean.omega.cand <- mean.omega.cand
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
     }
     #
     lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
@@ -383,18 +379,16 @@ mcmc.dem.lo <- function(y, iter, expo, lambda0 = rep(0,length(y)),
       mean.omega.cand <- omega.mat[(i-1),]
       var.lambda.cand <- var.lambda.cand
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu
-        mean.omega.cand <- eta
-        var.lambda.cand <- sigma
-        var.omega.cand <- tau
-      } else{
-        mean.lambda.cand <- mean.lambda.cand
-        mean.omega.cand <- mean.omega.cand
-        var.lambda.cand <- var.lambda.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.lambda.cand <- mu
+      mean.omega.cand <- eta
+      var.lambda.cand <- sigma
+      var.omega.cand <- tau
+    } else{
+      mean.lambda.cand <- mean.lambda.cand
+      mean.omega.cand <- mean.omega.cand
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
     }
     #
     lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
@@ -456,14 +450,12 @@ mcmc.dem.om <- function(y, iter, expo, lambda, omega0 = rep(0,length(y)),
     if(model.upd=="RW"){
       mean.omega.cand <- omega.mat[(i-1),]
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.omega.cand <- eta
-        var.omega.cand <- tau
-      } else{
-        mean.omega.cand <- mean.omega.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if(model.upd=="Gibbs"){
+      mean.omega.cand <- eta
+      var.omega.cand <- tau
+    } else{
+      mean.omega.cand <- mean.omega.cand
+      var.omega.cand <- var.omega.cand
     }
     #
     omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
@@ -558,22 +550,20 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
       mean.omega.cand <- omega.mat[(i-1),]
       var.lambda.cand <- var.lambda.cand
       var.omega.cand <- var.omega.cand
-    } else {
-      if(model.upd=="Gibbs"){
-        mean.lambda.cand <- mu.curr
-        mean.omega.cand <- eta.curr
-        var.lambda.cand <- sigma
-        var.omega.cand <- tau
-      } else{
-        mean.lambda.cand <- mean.lambda.cand
-        mean.omega.cand <- mean.omega.cand
-        var.lambda.cand <- var.lambda.cand
-        var.omega.cand <- var.omega.cand
-      }
+    } else if (model.upd=="Gibbs") {
+      mean.lambda.cand <- mu.curr
+      mean.omega.cand <- eta.curr
+      var.lambda.cand <- sigma
+      var.omega.cand <- tau
+    } else{
+      mean.lambda.cand <- mean.lambda.cand
+      mean.omega.cand <- mean.omega.cand
+      var.lambda.cand <- var.lambda.cand
+      var.omega.cand <- var.omega.cand
     }
-   #
-    lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
-    omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
+  #
+  lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
+  omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
 
 
     # Exchange algorithm for lambda
@@ -585,7 +575,7 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
                                    eta.curr, tau)$test
     }
 
-    lambda.mat[i,] <- ifelse(par.post, lambda.cand, lambda.curr)
+    lambda.mat[i,] <- ifelse(par.post.lambda, lambda.cand, lambda.curr)
     acceptance.lambda <- ifelse(par.post.lambda, acceptance.lambda + 1, acceptance.lambda)
 
 
@@ -599,7 +589,7 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
                                   eta.curr, tau)$test
     }
 
-    omega.mat[i,] <- ifelse(par.post, omega.cand, omega.curr)
+    omega.mat[i,] <- ifelse(par.post.omega, omega.cand, omega.curr)
     acceptance.omega <- ifelse(par.post.omega, acceptance.omega + 1, acceptance.omega)
 
   }
@@ -608,6 +598,5 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
   return(list (parameters = list(gamma = exp(lambda.mat), nu = exp(omega.mat),
                                  mu = mu.vec, eta = eta.vec),
                acceptance = list(gamma=acceptance.lambda/iter,
-                                 nu = acceptance.omega/iter))
-  )
+                                 nu = acceptance.omega/iter)))
 }
