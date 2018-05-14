@@ -161,7 +161,7 @@ mcmc.dem.kvslom.un <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0
                              mu0 = 0, sigma, eta0 = 0, tau,
                              alpha0 = 0, beta0 = 10, delta0 = 0, xi0 = 10,
                              mean.lambda.cand = 0, mean.omega.cand = 0,
-                             var.lambda.cand = 1, var.omega.cand = 1,
+                             sd.lambda.cand = 1, sd.omega.cand = 1,
                              model.upd){
 
   n <- length(y)
@@ -285,7 +285,7 @@ mcmc.dem.double <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
                             mu0 = 0, sigma, eta0 = 0, tau,
                             alpha0 = 0, beta0 = 10, delta0 = 0, xi0 = 10,
                             mean.lambda.cand = 0, mean.omega.cand = 0,
-                            var.lambda.cand = 10, var.omega.cand = 10,
+                            sd.lambda.cand = 10, sd.omega.cand = 10,
                             model.upd){
   n <- length(y)
   # Space for storing values

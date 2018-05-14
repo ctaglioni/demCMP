@@ -111,8 +111,8 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,length(y)), nu0 = rep(
 mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(0,length(y)),
                         mu0 = 0, sigma0 = 0.1, eta0 = 0, tau0 = 0.5,
                         alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
-                        sh.sigma0 = length(y), sh.tau0 = length(y),
-                        sc.sigma0 = 0.1, sc.tau0 = 0.1,
+                        sh.sigma0 = 0.001, sh.tau0 = 0.001,
+                        sc.sigma0 = 0.001, sc.tau0 = 0.001,
                         mean.lambda.cand = 0, mean.omega.cand = 0,
                         sd.lambda.cand = 1, sd.omega.cand = 1,
                         model.upd){
