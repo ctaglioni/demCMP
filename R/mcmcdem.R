@@ -6,11 +6,11 @@ library(LaplacesDemon) # to use half t distribution
 # First simple model, sd = half t
 #---------------------------------
 # Function for variance M-H algorithm
-lpost.var <- function(var.cand, ldata.curr, mean.curr, var.curr, scale.var, nu.var){
-  lprior.cand <- dhalft(var.cand, scale = scale.var, nu = nu.var, log=T)
-  llike.cand <- sum(dnorm(ldata.curr, mean = mean.curr, sd = var.cand, log = T))
-  lprior.curr <- dhalft(var.curr, scale = scale.var, nu = nu.var, log=T)
-  llike.curr <- sum(dnorm(ldata.curr, mean = mean.curr, sd = var.curr, log = T))
+lpost.sd <- function(sd.cand, ldata.curr, mean.curr, sd.curr, scale.sd, nu.sd){
+  lprior.cand <- dhalft(sd.cand, scale = scale.sd, nu = nu.sd, log = T)
+  llike.cand <- sum(dnorm(ldata.curr, mean = mean.curr, sd = sd.cand, log = T))
+  lprior.curr <- dhalft(sd.curr, scale = scale.sd, nu = nu.sd, log = T)
+  llike.curr <- sum(dnorm(ldata.curr, mean = mean.curr, sd = sd.curr, log = T))
   lpost <- lprior.cand + llike.cand - lprior.curr - llike.curr
   return(lpost>log(runif(1)))
 }
@@ -75,7 +75,7 @@ mcmc.dem.simple <- function(y, iter, expo, gamma0 = rep(1,length(y)), nu0 = rep(
     par.post.g<- c()
     for(k in 1:n){
       par.post.g[k] <- a.exch(y[k], lgamma.curr[k], lnu.curr[k],
-                              lgamma.cand2[k], lnu.curr[k], expo[k], 
+                              lgamma.cand2[k], lnu.curr[k], expo[k],
                               mu, sigma, eta, tau)$test
     }
 
@@ -114,7 +114,7 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
                         sh.sigma0 = length(y), sh.tau0 = length(y),
                         sc.sigma0 = 0.1, sc.tau0 = 0.1,
                         mean.lambda.cand = 0, mean.omega.cand = 0,
-                        var.lambda.cand = 1, var.omega.cand = 1,
+                        sd.lambda.cand = 1, sd.omega.cand = 1,
                         model.upd){
 
   n <- length(y)
@@ -149,11 +149,11 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
 
     # Update mu
     # mean
-    num.alpha <- alpha0 / beta0 + sum(lambda.mat[(i-1),])/sigma.vec[(i-1)]
-    den.alpha <- (1 / beta0 + n / sigma.vec[(i-1)])
+    num.alpha <- alpha0 / beta0^2 + sum(lambda.mat[(i-1),])/(sigma.vec[(i-1)])^2
+    den.alpha <- (1 / beta0^2 + n / (sigma.vec[(i-1)])^2)
     alpha <-  num.alpha / den.alpha
     # sd
-    beta <- sqrt(1 / (1 / beta0 + n / sigma.vec[(i-1)]))
+    beta <- sqrt(1 / (1 / beta0^2 + n / (sigma.vec[(i-1)])^2))
     #
     mu.vec[i] <- rnorm(1, alpha, beta)
 
@@ -163,15 +163,15 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
     # scale
     sc.sigma <- sc.sigma0 + 0.5 * sum((lambda.mat[(i-1),] - mu.vec[i])^2)
     #
-    sigma.vec[i] <- 1 / rgamma(1, shape = sh.sigma, scale = sc.sigma)
+    sigma.vec[i] <- sqrt(1 / rgamma(1, shape = sh.sigma, scale = sc.sigma))
 
     # Update eta
     # mean
-    num.delta <- delta0 / xi0 + sum(omega.mat[(i-1),])/tau.vec[(i-1)]
-    den.delta <- 1 / xi0 + n / tau.vec[(i-1)]
+    num.delta <- delta0 / xi0^2 + sum(omega.mat[(i-1),])/(tau.vec[(i-1)])^2
+    den.delta <- 1 / xi0^2 + n / (tau.vec[(i-1)])^2
     delta <-  num.delta / den.delta
     # sd
-    xi <- sqrt(1 / (1 / xi0 + n / tau.vec[(i-1)]))
+    xi <- sqrt(1 / (1 / xi0^2 + n / (tau.vec[(i-1)])^2 ))
     #
     eta.vec[i] <- rnorm(1, delta, xi)
 
@@ -181,7 +181,7 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
     # scale
     sc.tau <- sc.tau0 + 0.5 * sum((omega.mat[(i-1),] - eta.vec[i])^2)
     #
-    tau.vec[i] <- 1 / rgamma(1, shape = sh.tau, scale = sc.tau)
+    tau.vec[i] <- sqrt(1 / rgamma(1, shape = sh.tau, scale = sc.tau))
 
     mu.curr <- mu.vec[i]
     sigma.curr <- sigma.vec[i]
@@ -194,24 +194,24 @@ mcmc.dem.IG <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
     if(model.upd=="RW"){
       mean.lambda.cand <- lambda.mat[(i-1),]
       mean.omega.cand <- omega.mat[(i-1),]
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     } else if(model.upd=="Gibbs"){
       mean.lambda.cand <- mu.curr
       mean.omega.cand <- eta.curr
-      var.lambda.cand <- sqrt(sigma.curr)
-      var.omega.cand <- sqrt(tau.curr)
+      sd.lambda.cand <- sigma.curr
+      sd.omega.cand <- tau.curr
     } else{
       mean.lambda.cand <- mean.lambda.cand
       mean.omega.cand <- mean.omega.cand
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     }
 
 
     #
-    lambda.cand<- rnorm(n, mean.lambda.cand, var.lambda.cand)
-    omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
+    lambda.cand<- rnorm(n, mean.lambda.cand, sd.lambda.cand)
+    omega.cand <- rnorm(n, mean.omega.cand, sd.omega.cand)
 
 
     # Exchange algorithm for lambda and omega
@@ -244,7 +244,7 @@ mcmc.dem.KV <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
                         mu0 = 0, sigma, eta0 = 0, tau,
                         alpha0 = 0, beta0 = 0.1, delta0 = 0, xi0 = 0.1,
                         mean.lambda.cand = 0, mean.omega.cand = 0,
-                        var.lambda.cand = 1, var.omega.cand = 1,
+                        sd.lambda.cand = 1, sd.omega.cand = 1,
                         model.upd){
 
   n <- length(y)
@@ -276,21 +276,21 @@ mcmc.dem.KV <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
 
     # Update mu
     # mean
-    num.alpha <- alpha0 / beta0 + sum(lambda.mat[(i-1),])/sigma
-    den.alpha <- (1 / beta0 + n / sigma)
+    num.alpha <- alpha0 / beta0^2 + sum(lambda.mat[(i-1),])/sigma^2
+    den.alpha <- (1 / beta0^2 + n / sigma^2)
     alpha <-  num.alpha / den.alpha
     # sd
-    beta <- sqrt(1 / (1 / beta0 + n / sigma))
+    beta <- sqrt(1 / (1 / beta0^2 + n / sigma^2))
     #
     mu.vec[i] <- rnorm(1, alpha, beta)
 
     # Update eta
     # mean
-    num.delta <- delta0 / xi0 + sum(omega.mat[(i-1),])/tau
-    den.delta <- 1 / xi0 + n / tau
+    num.delta <- delta0 / xi0^2 + sum(omega.mat[(i-1),])/tau^2
+    den.delta <- 1 / xi0^2 + n / tau^2
     delta <-  num.delta / den.delta
     # sd
-    xi <- sqrt(1 / (1 / xi0 + n / tau))
+    xi <- sqrt(1 / (1 / xi0^2 + n / tau^2))
     #
     eta.vec[i] <- rnorm(1, delta, xi)
 
@@ -303,22 +303,22 @@ mcmc.dem.KV <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = rep(
     if(model.upd=="RW"){
       mean.lambda.cand <- lambda.mat[(i-1),]
       mean.omega.cand <- omega.mat[(i-1),]
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     } else if(model.upd=="Gibbs"){
       mean.lambda.cand <- mu.curr
       mean.omega.cand <- eta.curr
-      var.lambda.cand <- sigma
-      var.omega.cand <- tau
+      sd.lambda.cand <- sigma
+      sd.omega.cand <- tau
     } else{
       mean.lambda.cand <- mean.lambda.cand
       mean.omega.cand <- mean.omega.cand
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     }
     #
-    lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
-    omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
+    lambda.cand <- rnorm(n, mean.lambda.cand, sd.lambda.cand)
+    omega.cand <- rnorm(n, mean.omega.cand, sd.omega.cand)
 
 
     # Exchange algorithm for lambda and omega
@@ -349,7 +349,7 @@ mcmc.dem.lo <- function(y, iter, expo, lambda0 = rep(0,length(y)),
                         omega0 = rep(0,length(y)),
                         mu, sigma, eta, tau,
                         mean.lambda.cand = 0, mean.omega.cand = 0,
-                        var.lambda.cand = 1, var.omega.cand = 1,
+                        sd.lambda.cand = 1, sd.omega.cand = 1,
                         model.upd){
 
   n <- length(y)
@@ -380,22 +380,22 @@ mcmc.dem.lo <- function(y, iter, expo, lambda0 = rep(0,length(y)),
     if(model.upd=="RW"){
       mean.lambda.cand <- lambda.mat[(i-1),]
       mean.omega.cand <- omega.mat[(i-1),]
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     } else if(model.upd=="Gibbs"){
       mean.lambda.cand <- mu
       mean.omega.cand <- eta
-      var.lambda.cand <- sigma
-      var.omega.cand <- tau
+      sd.lambda.cand <- sigma
+      sd.omega.cand <- tau
     } else{
       mean.lambda.cand <- mean.lambda.cand
       mean.omega.cand <- mean.omega.cand
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     }
     #
-    lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
-    omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
+    lambda.cand <- rnorm(n, mean.lambda.cand, sd.lambda.cand)
+    omega.cand <- rnorm(n, mean.omega.cand, sd.omega.cand)
 
 
     # Exchange algorithm for lambda and omega
@@ -425,7 +425,7 @@ mcmc.dem.lo <- function(y, iter, expo, lambda0 = rep(0,length(y)),
 mcmc.dem.om <- function(y, iter, expo, lambda, omega0 = rep(0,length(y)),
                         mu, sigma, eta, tau,
                         mean.omega.cand = 0,
-                        var.omega.cand = 1,
+                        sd.omega.cand = 1,
                         model.upd){
 
   n <- length(y)
@@ -451,16 +451,16 @@ mcmc.dem.om <- function(y, iter, expo, lambda, omega0 = rep(0,length(y)),
     # or with hyperparameters if Gibbs
     if(model.upd=="RW"){
       mean.omega.cand <- omega.mat[(i-1),]
-      var.omega.cand <- var.omega.cand
+      sd.omega.cand <- sd.omega.cand
     } else if(model.upd=="Gibbs"){
       mean.omega.cand <- eta
-      var.omega.cand <- tau
+      sd.omega.cand <- tau
     } else{
       mean.omega.cand <- mean.omega.cand
-      var.omega.cand <- var.omega.cand
+      sd.omega.cand <- sd.omega.cand
     }
     #
-    omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
+    omega.cand <- rnorm(n, mean.omega.cand, sd.omega.cand)
 
 
     # Exchange algorithm for lambda and omega
@@ -489,7 +489,7 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
                             mu0 = 0, sigma, eta0 = 0, tau0 = 0,
                             alpha0 = 0, beta0 = 10, delta0 = 0, xi0 = 10,
                             mean.lambda.cand = 0, mean.omega.cand = 0,
-                            var.lambda.cand = 1, var.omega.cand = 1,
+                            sd.lambda.cand = 1, sd.omega.cand = 1,
                             model.upd){
 
   n <- length(y)
@@ -522,21 +522,21 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
 
     # Update mu
     # mean
-    num.alpha <- alpha0 / beta0 + sum(lambda.mat[(i-1),])/sigma
-    den.alpha <- (1 / beta0 + n / sigma)
+    num.alpha <- alpha0 / beta0^2 + sum(lambda.mat[(i-1),])/sigma^2
+    den.alpha <- (1 / beta0^2 + n / sigma^2)
     alpha <-  num.alpha / den.alpha
     # sd
-    beta <- sqrt(1 / (1 / beta0 + n / sigma))
+    beta <- sqrt(1 / (1 / beta0^2 + n / sigma^2))
     #
     mu.vec[i] <- rnorm(1, alpha, beta)
 
     # Update eta
     # mean
-    num.delta <- delta0 / xi0 + sum(omega.mat[(i-1),])/tau
-    den.delta <- 1 / xi0 + 1 / tau
+    num.delta <- delta0 / xi0^2 + sum(omega.mat[(i-1),])/tau^2
+    den.delta <- 1 / xi0^2 + 1 / tau^2
     delta <-  num.delta / den.delta
     # sd
-    xi <- sqrt(1 / (1 / xi0 + 1 / tau))
+    xi <- sqrt(1 / (1 / xi0^2 + 1 / tau^2))
     #
     eta.vec[i] <- rnorm(1, delta, xi)
 
@@ -549,22 +549,22 @@ mcmc.dem.kvslom <- function(y, iter, expo, lambda0 = rep(0,length(y)), omega0 = 
     if(model.upd=="RW"){
       mean.lambda.cand <- lambda.mat[(i-1),]
       mean.omega.cand <- omega.mat[(i-1),]
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     } else if (model.upd=="Gibbs") {
       mean.lambda.cand <- mu.curr
       mean.omega.cand <- eta.curr
-      var.lambda.cand <- sigma
-      var.omega.cand <- tau
+      sd.lambda.cand <- sigma
+      sd.omega.cand <- tau
     } else{
       mean.lambda.cand <- mean.lambda.cand
       mean.omega.cand <- mean.omega.cand
-      var.lambda.cand <- var.lambda.cand
-      var.omega.cand <- var.omega.cand
+      sd.lambda.cand <- sd.lambda.cand
+      sd.omega.cand <- sd.omega.cand
     }
   #
-  lambda.cand <- rnorm(n, mean.lambda.cand, var.lambda.cand)
-  omega.cand <- rnorm(n, mean.omega.cand, var.omega.cand)
+  lambda.cand <- rnorm(n, mean.lambda.cand, sd.lambda.cand)
+  omega.cand <- rnorm(n, mean.omega.cand, sd.omega.cand)
 
 
     # Exchange algorithm for lambda
